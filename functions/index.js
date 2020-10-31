@@ -8,15 +8,17 @@ exports.exploreLinks = functions.https.onRequest(async (request, response) => {
         
         const root = request.body.url;
         
+        const buttonTextsToClick = ['Show', 'More', 'View', 'Mostrar', 'Ver', 'Más'];
+        
         const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox']});
         
         const page = await browser.newPage();
         
         await page.goto(root, {waitUntil: 'networkidle0'});
         
-        let urlsToVisit = await page.$$eval('a', links => links.map(link => link.href));  
+        let urlsToVisit = await page.$$eval('a', (links, root) => links.map(link => link.href).filter(link => link.startsWith(root)), root);  
         
-        urlsToVisit = urlsToVisit.filter(link => link.startsWith(root));
+        console.log(urlsToVisit);
         
         let urlsVisited = {[root]: true};
         
@@ -29,9 +31,7 @@ exports.exploreLinks = functions.https.onRequest(async (request, response) => {
                 
                 await page.goto(url, {waitUntil: 'networkidle0'});
                 
-                await page.$$eval('button', buttons => buttons.forEach(button => {
-                    
-                    const buttonTextsToClick = ['Show', 'More', 'View', 'Mostrar', 'Ver', 'Más'];
+                await page.$$eval('button', (buttons, buttonTextsToClick) => buttons.forEach(button => {
                     
                     if(buttonTextsToClick.some(text => button.innerText.includes(text))){
                         
@@ -43,11 +43,9 @@ exports.exploreLinks = functions.https.onRequest(async (request, response) => {
                         
                     }
                     
-                }));
+                }), buttonTextsToClick);
                 
-                let _urlsToVisit = await page.$$eval('a', links => links.map(link => link.href));
-                
-                _urlsToVisit = _urlsToVisit.filter(link => link.startsWith(root));
+                let _urlsToVisit = await page.$$eval('a', (links, root) => links.map(link => link.href).filter(link => link.startsWith(root)), root);
                 
                 urlsToVisit = [...new Set([...urlsToVisit, ..._urlsToVisit])];
                 
