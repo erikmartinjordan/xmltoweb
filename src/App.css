@@ -1,14 +1,26 @@
 .App{
-    align-items: center;
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    width: 100vw;
-}
-.App .Wrap{
-    align-items: center;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+}
+.App .Title{
+    display: flex;
+    height: 40vh;
+    justify-content: center;
+}
+.App .Title svg{
+    margin: 50px;
+    width: 500px;
+}
+.App .Search{
+    align-items: center;
+    display: flex;
+    height: 40vh;
+    flex-direction: column;
+}
+.App .Info{
+    margin: auto;
+    max-width: 1200px;
 }
 .App h1{
     font-size: 50px;
@@ -19,9 +31,17 @@
     margin: 0;
     margin-bottom: 20px;
 }
+.App form{
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+    padding: 40px;
+}
 .App input{
-    border: 1px solid gray;
+    background: #f4f8fb;
+    border: none;
     border-radius: 3px;
+    font-size: large;
     margin-right: 5px;
     padding: 10px;
     width: 200px;
@@ -32,5 +52,18 @@
     border-radius: 3px;
     box-shadow: rgba(15, 15, 15, 0.1) 0px 1px 2px;
     color: white;
+    font-size: large;
     padding: 10px 15px;
+}
+.App .Footer{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+.App .Footer .Text{
+    background: #0088cc;
+    color: #f4f8fb;
+    display: flex;
+    justify-content: center;
+    padding: 50px;
 }
