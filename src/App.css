@@ -9,14 +9,34 @@
     justify-content: center;
 }
 .App .Title svg{
+    height: 250px;
     margin: 50px;
-    width: 500px;
+    width: 250px;
 }
 .App .Search{
     align-items: center;
     display: flex;
     height: 40vh;
     flex-direction: column;
+}
+.App .Protocol{
+    margin-right: 10px;
+}
+.App .Protocol span{
+    background: #f4f8fb;
+    cursor: pointer;
+    padding: 10px;
+}
+.App .Protocol span:first-child{
+    border-radius: 7px 0px 0px 7px;
+}
+.App .Protocol span:nth-child(2){
+    border-radius: 0px 7px 7px 0px;
+}
+.App .Protocol span.Selected{
+    background: #0088cc;
+    color: white;
+    transition: 0.3s ease-in-out;
 }
 .App .Info{
     margin: auto;
@@ -42,18 +62,29 @@
     border: none;
     border-radius: 3px;
     font-size: large;
-    margin-right: 5px;
+    margin-right: 10px;
+    outline: none;
     padding: 10px;
     width: 200px;
 }
 .App button{
     background: #0088cc;
     border: 1px solid #0088cc;
-    border-radius: 3px;
+    border-radius: 7px;
     box-shadow: rgba(15, 15, 15, 0.1) 0px 1px 2px;
     color: white;
+    cursor: pointer;
     font-size: large;
     padding: 10px 15px;
+}
+.App button:disabled{
+    opacity: 0.8;
+}
+.App .Error{
+    color: red;
+    font-size: small;
+    margin-top: 10px;
+    width: 100%;
 }
 .App .Footer{
     display: flex;
@@ -62,8 +93,28 @@
 }
 .App .Footer .Text{
     background: #0088cc;
-    color: #f4f8fb;
     display: flex;
     justify-content: center;
     padding: 50px;
+}
+.App .Footer .Text p{
+    color: #f4f8fb;
+}
+.App .Footer .Text a{
+    color: white;
+    text-decoration: underline;
+}
+@media(max-width: 768px){
+    
+    .App .Search{
+        padding: 20px;
+    }
+    .App form{
+        display: flex;
+        flex-direction: column;
+    }
+    .App form *{
+        max-width: 100%;
+    }
+    
 }

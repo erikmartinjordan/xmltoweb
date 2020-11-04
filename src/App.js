@@ -1,16 +1,21 @@
-import { useState }                   from 'react';
+import React, { useState }            from 'react';
+import moment                         from 'moment';
 import { ReactComponent as Chipmunk } from './chipmunk.svg';
+import { ReactComponent as Wave }     from './wave.svg';
 import './App.css';
 
 const App = () => {
     
-    const [url, setUrl] = useState('');
+    const [error, setError]       = useState('');
+    const [protocol, setProtocol] = useState('https://');
+    const [status, setStatus]     = useState('idle');
+    const [url, setUrl]           = useState('');
     
-    const scanUrl = async (e) => {
+    const scanUrl = async (url) => {
         
-        e.preventDefault();
+        setStatus('processing');
         
-        const response = await fetch('https://us-central1-xml-generator-pre.cloudfunctions.net/exploreLinks', {
+        let response = await fetch('https://us-central1-xmlator-pre.cloudfunctions.net/exploreLinks', {
            
             method: 'POST',
             headers:{'Content-type': 'application/json'},
@@ -20,11 +25,45 @@ const App = () => {
         
         if(response.ok){
             
-            const urlsVisited = await response.json();
+            let urlsVisited = await response.json();
+            let date = moment().format('YYYY'-'MM'-'DD');
             
-            console.log(urlsVisited);
+            let xmlHeader = `<?xml version = '1.0' encoding = 'UTF-8'?><urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>`;
+            let xmlBody = Object.keys(urlsVisited).reduce((acc, url) => acc += `<url><loc>${url}</loc><lastmod>${date}</lastmod></url>`);
+            let xmlFooter = `</urlset>`;
+            
+            let xmlStr = xmlHeader + xmlBody + xmlFooter;
+            
+            let blob = new Blob([xmlStr], {type: 'text/xml'});
+            let downloadUrl = URL.createObjectURL(blob);
+            
+            var fileLink = document.createElement('a');
+            
+            fileLink.href = downloadUrl;
+            fileLink.download = 'test.xml';
+            fileLink.click();
+            
+            setStatus('processed');
             
         }
+        
+    }
+    
+    const handleUrl = (e) => {
+        
+        setUrl(e.target.value);
+        setError(null);
+        
+    }
+    
+    const validateUrl = (e) => {
+        
+        e.preventDefault();
+        
+        let valid = (protocol + url).match(/^(http(s)?\:\/\/)?[a-zA-Z0-9-]+\.[a-z]{2,}$/);
+        
+        if(!valid) setError('Invalid URL. Example of valid URL: google.com');
+        else       scanUrl(protocol + url);
         
     }
     
@@ -37,15 +76,29 @@ const App = () => {
                 <h1>Get your xml!</h1>
                 <p>A tool to scan your website and generate an xml automatically.</p>
                 <form>
-                    <input  onChange = {(e) => setUrl(e.target.value)} placeholder = 'Enter your website...'/>
-                    <button onClick = {(e) => scanUrl(e)} >Generate xml</button>
+                    <span className = 'Protocol'>
+                        <span className = {protocol === 'https://' ? 'Selected' : null} onClick = {() => setProtocol('https://')}>https://</span>
+                        <span className = {protocol === 'http://'  ? 'Selected' : null} onClick = {() => setProtocol('http://')}>http://</span>
+                    </span>
+                    <input  onChange = {handleUrl}   placeholder = 'Enter your website...' autoFocus/>
+                    <button onClick  = {validateUrl} disabled = {status === 'processing' || status === 'processed'}>
+                        {
+                            {
+                                'idle': 'Generate xml',
+                                'processing': 'Scanning...',
+                                'processed': 'Ready!'
+                                
+                            }[status]
+                        }
+                    </button>
+                    <div className = 'Error'>{error}</div>
                 </form>
             </div>
             <div className = 'Footer'>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-                    <path fill = "#0088cc" fill-opacity = "1" d="M0,192L20,165.3C40,139,80,85,120,90.7C160,96,200,160,240,165.3C280,171,320,117,360,96C400,75,440,85,480,117.3C520,149,560,203,600,213.3C640,224,680,192,720,202.7C760,213,800,267,840,240C880,213,920,107,960,85.3C1000,64,1040,128,1080,138.7C1120,149,1160,107,1200,85.3C1240,64,1280,64,1320,69.3C1360,75,1400,85,1420,90.7L1440,96L1440,320L1420,320C1400,320,1360,320,1320,320C1280,320,1240,320,1200,320C1160,320,1120,320,1080,320C1040,320,1000,320,960,320C920,320,880,320,840,320C800,320,760,320,720,320C680,320,640,320,600,320C560,320,520,320,480,320C440,320,400,320,360,320C320,320,280,320,240,320C200,320,160,320,120,320C80,320,40,320,20,320L0,320Z"></path>
-                </svg>
-                <div className = 'Text'>© 2020 by Erik Martín Jordán</div>
+                <Wave/>
+                <div className = 'Text'>
+                    <p>© {moment().format('YYYY')} xmlchipmunk.com, by <a href = 'erikmartinjordan.com'>Erik Martín Jordán</a></p>
+                </div>
             </div>
         </div>
     );
